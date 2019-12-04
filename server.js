@@ -17,10 +17,20 @@ function gatekeeper(req, res, next) {
   else res.status(401).send("Faild to pass");
 }
 
+function gatekeeper(req, res, next) {
+  // if (req.originalUrl == "/mellon") next();
+  // else res.status(401).send("Faild to pass");
+
+  const password = req.headers.password;
+
+  if (password && password.toLowerCase() == "mellon") next();
+  else res.status(401).json({ you: "shall not pass !!" });
+}
+
 server.use(express.json());
 server.use("/api/hubs", hubsRouter);
 server.use(logger);
-server.use(gatekeeper);
+// server.use(gatekeeper);
 
 server.get("/", (req, res) => {
   const nameInsert = req.name ? ` ${req.name}` : "";
@@ -31,7 +41,7 @@ server.get("/", (req, res) => {
     `);
 });
 
-server.get("/echo", (req, res) => {
+server.get("/echo", gatekeeper, (req, res) => {
   res.send(req.headers);
 });
 server.get("/area51", helmet(), (req, res) => {
